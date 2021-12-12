@@ -1,8 +1,6 @@
 <template>
     <div class="dropdown" ref="dropdownRef">
-        <a class="btn btn-outline-light my-2 dropdown-toggle" href="#" @click.prevent="toggle">{{
-            title
-        }}</a>
+        <a class="btn btn-outline-light my-2 dropdown-toggle" href="#" @click.prevent="toggle">{{ title }}</a>
         <ul class="dropdown-menu" style="display: block; left: -68%" v-show="visible">
             <li v-for="(item, index) in dropdownList" :key="index">
                 <a class="dropdown-item" :class="{ disabled: item.disabled }" href="#">{{

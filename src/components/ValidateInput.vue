@@ -78,6 +78,9 @@ export default defineComponent({
             inputData.error = !passed
             return passed
         }
+        const clearInput = () => {
+            inputData.val = ''
+        }
         const upDateValue = (e: KeyboardEvent) => {
             const newValue = (e.target as HTMLInputElement).value
             inputData.val = newValue
@@ -85,6 +88,7 @@ export default defineComponent({
         }
         onMounted(() => {
             emitter.emit('formItemCreated', validate)
+            emitter.emit('formItemClean', clearInput)
         })
         return {
             inputData,

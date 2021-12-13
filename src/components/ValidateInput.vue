@@ -13,7 +13,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, reactive } from '@vue/runtime-core'
+import { defineComponent, onMounted, PropType, reactive } from '@vue/runtime-core'
+import { emitter } from './ValidateForm.vue'
 
 interface RuleItem {
     type: 'required' | 'email' | 'range'
@@ -29,7 +30,7 @@ interface RuleItem {
 }
 const emailReg = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
 export default defineComponent({
-    name: 'DInput',
+    name: 'ValidateInput',
     inheritAttrs: false,
     props: {
         rules: {
@@ -58,12 +59,12 @@ export default defineComponent({
                         passed = emailReg.test(inputData.val)
                         break
                     case 'range':
-                        if (item.min && (inputData.val.length <= item.min.length || inputData.val.includes(' '))) {
+                        if (item.min && (inputData.val.length < item.min.length || inputData.val.includes(' '))) {
                             passed = false
                             inputData.message = item.min.message
                         } else if (
                             item.max &&
-                            (inputData.val.length >= item.max.length || inputData.val.includes(' '))
+                            (inputData.val.length > item.max.length || inputData.val.includes(' '))
                         ) {
                             passed = false
                             inputData.message = item.max.message
@@ -75,12 +76,16 @@ export default defineComponent({
                 return passed
             })
             inputData.error = !passed
+            return passed
         }
         const upDateValue = (e: KeyboardEvent) => {
             const newValue = (e.target as HTMLInputElement).value
             inputData.val = newValue
             context.emit('update:modelValue', newValue)
         }
+        onMounted(() => {
+            emitter.emit('formItemCreated', validate)
+        })
         return {
             inputData,
             validate,

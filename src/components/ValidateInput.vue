@@ -16,7 +16,7 @@
 import { defineComponent, onMounted, PropType, reactive } from '@vue/runtime-core'
 import { emitter } from './ValidateForm.vue'
 
-interface RuleItem {
+export interface RuleItem {
     type: 'required' | 'email' | 'range'
     message: string
     min?: {

@@ -1,6 +1,17 @@
 <template>
     <div class="validate-input-container pb-3">
         <input
+            v-if="tag !== 'textarea'"
+            class="form-control"
+            :class="{ 'is-invalid': inputData.error }"
+            :value="inputData.val"
+            @blur="validate"
+            @input="upDateValue"
+            v-bind="$attrs"
+        />
+        <textarea
+            v-else
+            type="textarea"
             class="form-control"
             :class="{ 'is-invalid': inputData.error }"
             :value="inputData.val"
@@ -15,6 +26,8 @@
 <script lang="ts">
 import { defineComponent, onMounted, PropType, reactive } from '@vue/runtime-core'
 import { emitter } from './ValidateForm.vue'
+
+export type TagType = 'input' | 'textarea'
 
 export interface RuleItem {
     type: 'required' | 'email' | 'range'
@@ -39,6 +52,9 @@ export default defineComponent({
         },
         modelValue: {
             type: String
+        },
+        tag: {
+            type: String as PropType<TagType>
         }
     },
     setup(props, context) {

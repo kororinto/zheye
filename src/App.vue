@@ -1,5 +1,5 @@
 <template>
-    <GlobalHeader :user="user"></GlobalHeader>
+    <GlobalHeader :user="currentUser"></GlobalHeader>
     <div class="container">
         <router-view></router-view>
     </div>
@@ -7,14 +7,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { computed, defineComponent } from 'vue'
 import 'bootstrap/dist/css/bootstrap.min.css'
-import GlobalHeader, { UserInfo } from './components/GlobalHeader.vue'
+import GlobalHeader from './components/GlobalHeader.vue'
 import Footer from './components/Footer.vue'
+import { useStore } from 'vuex'
+import { GlobalDataProps } from './store'
 
-const user: UserInfo = {
-    isLogin: false
-}
 export default defineComponent({
     name: 'App',
     components: {
@@ -22,8 +21,10 @@ export default defineComponent({
         Footer
     },
     setup() {
+        const store = useStore<GlobalDataProps>()
+        const currentUser = computed(() => store.state.user)
         return {
-            user
+            currentUser
         }
     }
 })

@@ -58,11 +58,11 @@ export default defineComponent({
                 if (id) {
                     // 创建文章
                     const post: PostProps = {
-                        id: Date.now(),
+                        _id: Date.now().toString(),
                         title: titleVal.value,
                         content: contentVal.value,
                         createdAt: new Date().toString(),
-                        columnId: id
+                        column: id + ''
                     }
                     // 使用commit mutations 添加文章
                     store.commit('createPost', post)

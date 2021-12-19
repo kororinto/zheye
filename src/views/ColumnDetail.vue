@@ -2,23 +2,27 @@
     <div class="column-detail-page w-75 mx-auto">
         <div class="column-info row mb-4 border-bottom pb-4 align-items-center" v-if="column">
             <div class="col-3 text-center">
-                <img :src="column.avatar" :alt="column.title" class="rounded-circle border" />
+                <img
+                    :src="column.avatar && column.avatar.url"
+                    :alt="column.title"
+                    class="rounded-circle border w-100"
+                />
             </div>
             <div class="col-9">
                 <h4>{{ column.title }}</h4>
                 <p class="text-muted">{{ column.description }}</p>
             </div>
         </div>
-        <post-list :list="list"></post-list>
+        <post-list :list="postList"></post-list>
     </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from '@vue/runtime-core'
+import { computed, defineComponent, onMounted } from '@vue/runtime-core'
 import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
 import PostList from '../components/PostList.vue'
-import { GlobalDataProps } from '../store'
+import { GlobalDataProps, ColumnProps, PostProps } from '../store'
 
 export default defineComponent({
     name: 'ColumnDetail',
@@ -28,13 +32,23 @@ export default defineComponent({
     setup() {
         const store = useStore<GlobalDataProps>()
         const route = useRoute()
-        const currentId = +route.params.id
-        const column = computed(() => store.getters.getColumnById(currentId))
-        const list = computed(() => store.getters.getPostsByColumnId(currentId))
+        const currentId = route.params.id
+        onMounted(() => {
+            // 获取专栏信息和专栏文章列表
+            store.dispatch('getDataAndMutateState', { url: `/columns/${currentId}`, mutationName: 'getColumn' })
+            store.dispatch('getDataAndMutateState', { url: `/columns/${currentId}/posts`, mutationName: 'getPosts' })
+        })
+        const column = computed<ColumnProps>(() => store.getters.getColumnById(currentId))
+        const postList = computed<PostProps[]>(() => store.getters.getPostsByColumnId(currentId))
+        if (column.value && !column.value.avatar) {
+            column.value.avatar = {
+                url: require('@/assets/logo.png')
+            }
+        }
         return {
             route,
             column,
-            list
+            postList
         }
     }
 })

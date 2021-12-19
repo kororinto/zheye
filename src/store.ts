@@ -1,5 +1,5 @@
+import axios from 'axios'
 import { createStore } from 'vuex'
-import { testData, testPosts } from './testData'
 export interface UserProps {
     isLogin: boolean
     name?: string
@@ -9,26 +9,38 @@ export interface GlobalDataProps {
     columns: ColumnProps[]
     posts: PostProps[]
     user: UserProps
+    loading: boolean
+}
+export interface AvatarProps {
+    _id?: string
+    url?: string
+    createdAt?: string
 }
 export interface ColumnProps {
-    id: number
+    _id: string
     title: string
-    avatar?: string
+    avatar?: AvatarProps
     description: string
 }
 export interface PostProps {
-    id: number
+    _id: string
     title: string
-    content: string
-    image?: string
+    excerpt?: string
+    content?: string
+    image?: AvatarProps
     createdAt: string
-    columnId: number
+    column: string
+}
+interface GetDataAndMutateStateParams {
+    url: string
+    mutationName: string
 }
 const store = createStore<GlobalDataProps>({
     state: {
-        columns: testData,
-        posts: testPosts,
-        user: { isLogin: true, name: 'dx', id: 1 }
+        columns: [],
+        posts: [],
+        user: { isLogin: true, name: 'dx', id: 1 },
+        loading: false
     },
     mutations: {
         login(state) {
@@ -36,14 +48,32 @@ const store = createStore<GlobalDataProps>({
         },
         createPost(state, post) {
             state.posts.push(post)
+        },
+        getColumns(state, rawData) {
+            state.columns = rawData.data.list
+        },
+        getColumn(state, rawData) {
+            state.columns = [rawData.data]
+        },
+        getPosts(state, rawData) {
+            state.posts = rawData.data.list
+        },
+        setLoading(state, status) {
+            state.loading = status
+        }
+    },
+    actions: {
+        async getDataAndMutateState({ commit }, options: GetDataAndMutateStateParams) {
+            const { data } = await axios.get(options.url)
+            commit(options.mutationName, data)
         }
     },
     getters: {
-        getColumnById: (state) => (id: number) => {
-            return state.columns.find((item) => item.id === id)
+        getColumnById: (state) => (id: string) => {
+            return state.columns.find((item) => item._id === id)
         },
-        getPostsByColumnId: (state) => (columnId: number) => {
-            return state.posts.filter((item) => item.columnId === columnId)
+        getPostsByColumnId: (state) => (columnId: string) => {
+            return state.posts.filter((item) => item.column === columnId)
         }
     }
 })

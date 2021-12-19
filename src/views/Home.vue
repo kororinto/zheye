@@ -12,12 +12,12 @@
             </div>
         </section>
         <h4 class="font-weight-bold text-center">发现精彩</h4>
-        <column-list :list="list"></column-list>
+        <ColumnList :list="columnList"></ColumnList>
     </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue'
+import { computed, defineComponent, onMounted } from 'vue'
 import { useStore } from 'vuex'
 import ColumnList from '../components/ColumnList.vue'
 import { GlobalDataProps } from '../store'
@@ -28,9 +28,12 @@ export default defineComponent({
     },
     setup() {
         const store = useStore<GlobalDataProps>()
-        const list = computed(() => store.state.columns)
+        onMounted(() => {
+            store.dispatch('getDataAndMutateState', { url: `/columns`, mutationName: 'getColumns' })
+        })
+        const columnList = computed(() => store.state.columns)
         return {
-            list
+            columnList
         }
     }
 })

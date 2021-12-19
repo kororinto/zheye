@@ -29,7 +29,7 @@ export default defineComponent({
     setup() {
         const store = useStore<GlobalDataProps>()
         onMounted(() => {
-            store.dispatch('getDataAndMutateState', { url: `/columns`, mutationName: 'getColumns' })
+            store.dispatch('fetchColumns')
         })
         const columnList = computed(() => store.state.columns)
         return {

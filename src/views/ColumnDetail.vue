@@ -35,8 +35,8 @@ export default defineComponent({
         const currentId = route.params.id
         onMounted(() => {
             // 获取专栏信息和专栏文章列表
-            store.dispatch('getDataAndMutateState', { url: `/columns/${currentId}`, mutationName: 'getColumn' })
-            store.dispatch('getDataAndMutateState', { url: `/columns/${currentId}/posts`, mutationName: 'getPosts' })
+            store.dispatch('fetchColumn', currentId)
+            store.dispatch('fetchPosts', currentId)
         })
         const column = computed<ColumnProps>(() => store.getters.getColumnById(currentId))
         const postList = computed<PostProps[]>(() => store.getters.getPostsByColumnId(currentId))

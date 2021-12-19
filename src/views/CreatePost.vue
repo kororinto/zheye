@@ -54,21 +54,21 @@ export default defineComponent({
         const onFormSubmit = (result: boolean) => {
             if (result) {
                 // 获取用户的id 也就是用户专栏的id
-                const { id } = store.state.user
-                if (id) {
+                const { _id } = store.state.user
+                if (_id) {
                     // 创建文章
                     const post: PostProps = {
                         _id: Date.now().toString(),
                         title: titleVal.value,
                         content: contentVal.value,
                         createdAt: new Date().toString(),
-                        column: id + ''
+                        column: _id + ''
                     }
                     // 使用commit mutations 添加文章
                     store.commit('createPost', post)
                 }
                 // 跳转到专栏为id的页面
-                router.push({ name: 'column', params: { id } })
+                router.push({ name: 'column', params: { _id } })
             }
         }
         return {

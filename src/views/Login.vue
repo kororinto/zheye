@@ -21,11 +21,15 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue'
-import { useRouter } from 'vue-router'
 import ValidateInput, { RuleItem } from '../components/ValidateInput.vue'
 import ValidateForm from '../components/ValidateForm.vue'
 import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 
+interface LoginProps {
+    email: string
+    password: string
+}
 export default defineComponent({
     name: 'Login',
     components: {
@@ -43,10 +47,13 @@ export default defineComponent({
         const passwordVal = ref('')
         const passwordRules: RuleItem[] = [{ type: 'required', message: '密码不能为空' }]
         const onFormSubmit = (result: boolean) => {
-            console.log('result', result)
             if (result) {
-                store.commit('login')
-                router.push('/')
+                const params: LoginProps = {
+                    email: emailVal.value,
+                    password: passwordVal.value
+                }
+                store.dispatch('loginAndFetch', params)
+                router.push({ name: 'home' })
             }
         }
         return {

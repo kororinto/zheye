@@ -11,7 +11,7 @@
         </ul>
         <ul v-else class="list-inline mb-0">
             <li class="list-inline-item">
-                <Dropdown :title="`你好 ${user.name}`" :dropdownList="dropdownList"></Dropdown>
+                <Dropdown :title="`你好 ${user.nickName}`" :dropdownList="dropdownList"></Dropdown>
             </li>
         </ul>
     </nav>
@@ -20,12 +20,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from '@vue/runtime-core'
 import Dropdown, { DropdownItem } from './Dropdown.vue'
-
-export interface UserInfo {
-    isLogin: boolean
-    id?: number
-    name?: string
-}
+import { UserProps } from '../store'
 
 const dropdownList: DropdownItem[] = [
     {
@@ -48,7 +43,7 @@ export default defineComponent({
     props: {
         user: {
             required: true,
-            type: Object as PropType<UserInfo>
+            type: Object as PropType<UserProps>
         }
     },
     setup() {

@@ -30,7 +30,7 @@ import { emitter } from './ValidateForm.vue'
 export type TagType = 'input' | 'textarea'
 
 export interface RuleItem {
-    type: 'required' | 'email' | 'range'
+    type: 'required' | 'email' | 'range' | 'custom'
     message: string
     min?: {
         message: string
@@ -40,6 +40,7 @@ export interface RuleItem {
         message: string
         length: number
     }
+    validator?: () => boolean
 }
 const emailReg = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
 export default defineComponent({
@@ -84,6 +85,14 @@ export default defineComponent({
                         ) {
                             passed = false
                             inputData.message = item.max.message
+                        }
+                        break
+                    case 'custom':
+                        if (item.validator) {
+                            passed = item.validator()
+                        }
+                        if (!passed) {
+                            inputData.message = item.message
                         }
                         break
                     default:

@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { createStore, Commit } from 'vuex'
+import router from './router'
 
 export interface ImageProps {
     _id?: string
@@ -89,6 +90,12 @@ const store = createStore<GlobalDataProps>({
             state.token = token
             localStorage.setItem('token', token)
             axios.defaults.headers.common.Authorization = `Bearer ${token}`
+        },
+        logout(state) {
+            localStorage.removeItem('token')
+            state.token = ''
+            router.push({ name: 'home' })
+            location.reload()
         }
     },
     actions: {

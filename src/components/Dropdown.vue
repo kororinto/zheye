@@ -3,9 +3,9 @@
         <a class="btn btn-outline-light my-2 dropdown-toggle" href="#" @click.prevent="toggle">{{ title }}</a>
         <ul class="dropdown-menu" style="display: block; left: -68%" v-show="visible">
             <li v-for="(item, index) in dropdownList" :key="index">
-                <router-link class="dropdown-item" :class="{ disabled: item.disabled }" to="/create">{{
+                <a class="dropdown-item" :class="{ disabled: item.disabled }" @click="item.click">{{
                     item.title ? item.title : '下拉选项'
-                }}</router-link>
+                }}</a>
             </li>
         </ul>
     </div>
@@ -18,6 +18,7 @@ import useClickOutside from '../hooks/useClickOutside'
 export interface DropdownItem {
     title?: string
     disabled?: boolean
+    click?: () => void
 }
 
 export default defineComponent({

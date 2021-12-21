@@ -6,7 +6,7 @@
                 <router-link to="/login" class="btn btn-outline-light my-2">登陆</router-link>
             </li>
             <li class="list-inline-item">
-                <router-link to="/login" class="btn btn-outline-light my-2">注册</router-link>
+                <router-link to="/signup" class="btn btn-outline-light my-2">注册</router-link>
             </li>
         </ul>
         <ul v-else class="list-inline mb-0">
@@ -20,20 +20,9 @@
 <script lang="ts">
 import { defineComponent, PropType } from '@vue/runtime-core'
 import Dropdown, { DropdownItem } from './Dropdown.vue'
+import { useRouter } from 'vue-router'
+import { useStore } from 'vuex'
 import { UserProps } from '../store'
-
-const dropdownList: DropdownItem[] = [
-    {
-        title: '新建文章'
-    },
-    {
-        title: '编辑资料',
-        disabled: true
-    },
-    {
-        title: '退出登录'
-    }
-]
 
 export default defineComponent({
     name: 'GlobalHeader',
@@ -47,6 +36,26 @@ export default defineComponent({
         }
     },
     setup() {
+        const router = useRouter()
+        const store = useStore()
+        const dropdownList: DropdownItem[] = [
+            {
+                title: '新建文章',
+                click() {
+                    router.push({ name: 'create' })
+                }
+            },
+            {
+                title: '编辑资料',
+                disabled: true
+            },
+            {
+                title: '退出登录',
+                click() {
+                    store.commit('logout')
+                }
+            }
+        ]
         return {
             dropdownList
         }

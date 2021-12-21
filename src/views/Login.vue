@@ -25,6 +25,7 @@ import ValidateInput, { RuleItem } from '../components/ValidateInput.vue'
 import ValidateForm from '../components/ValidateForm.vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
+import createMessage from '../components/createMessage'
 
 interface LoginProps {
     email: string
@@ -48,12 +49,19 @@ export default defineComponent({
         const passwordRules: RuleItem[] = [{ type: 'required', message: '密码不能为空' }]
         const onFormSubmit = (result: boolean) => {
             if (result) {
-                const params: LoginProps = {
+                const payload: LoginProps = {
                     email: emailVal.value,
                     password: passwordVal.value
                 }
-                store.dispatch('loginAndFetch', params)
-                router.push({ name: 'home' })
+                store
+                    .dispatch('loginAndFetch', payload)
+                    .then(() => {
+                        createMessage('登录成功', 'success')
+                        router.push({ name: 'home' })
+                    })
+                    .catch((err) => {
+                        err
+                    })
             }
         }
         return {

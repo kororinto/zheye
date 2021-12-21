@@ -25,11 +25,22 @@ axios.interceptors.request.use((config) => {
     }
     // loading状态
     store.commit('setLoading', true)
+    // error状态置为false
+    store.commit('setError', { status: false, message: '' })
     return config
 })
-axios.interceptors.response.use((config) => {
-    // loading状态
-    store.commit('setLoading', false)
-    return config
-})
+axios.interceptors.response.use(
+    (config) => {
+        // loading状态
+        store.commit('setLoading', false)
+        return config
+    },
+    (e) => {
+        // console.dir(e)
+        const { error } = e.response.data
+        store.commit('setError', { status: true, message: error })
+        store.commit('setLoading', false)
+        return Promise.reject(error)
+    }
+)
 createApp(App).use(router).use(store).mount('#app')

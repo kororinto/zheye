@@ -30,12 +30,17 @@ export interface UserProps {
     description?: string
     avatar?: ImageProps
 }
+export interface ErrorProps {
+    status: boolean
+    message?: string
+}
 export interface GlobalDataProps {
     columns: ColumnProps[]
     posts: PostProps[]
     user: UserProps
     loading: boolean
     token: string
+    error: ErrorProps
 }
 
 const getAndCommit = async (url: string, mutationName: string, commit: Commit) => {
@@ -50,11 +55,12 @@ const postAndCommit = async (url: string, mutationName: string, commit: Commit, 
 
 const store = createStore<GlobalDataProps>({
     state: {
+        error: { status: false },
         columns: [],
         posts: [],
         user: { isLogin: false },
         loading: false,
-        token: ''
+        token: localStorage.getItem('token') || ''
     },
     mutations: {
         createPost(state, post) {
@@ -75,9 +81,13 @@ const store = createStore<GlobalDataProps>({
         setLoading(state, status) {
             state.loading = status
         },
+        setError(state, err) {
+            state.error = err
+        },
         login(state, rawData) {
             const { token } = rawData.data
             state.token = token
+            localStorage.setItem('token', token)
             axios.defaults.headers.common.Authorization = `Bearer ${token}`
         }
     },

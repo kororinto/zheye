@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import Message from './Message.vue'
 
-const createMessage = (message: string, type: MessageType, timeout = 2000): void => {
+const createMessage = (message: string, type: MessageType = 'default', timeout = 2000): void => {
     // 创建组件实例
     const messageInstance = createApp(Message, {
         type,

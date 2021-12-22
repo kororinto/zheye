@@ -2,6 +2,12 @@ import axios from 'axios'
 import { createStore, Commit } from 'vuex'
 import router from './router'
 
+export interface ResProps<T = any> {
+    code: number
+    data: T
+    msg: string
+}
+
 export interface ImageProps {
     _id?: string
     url?: string
@@ -67,16 +73,16 @@ const store = createStore<GlobalDataProps>({
         createPost(state, post) {
             state.posts.push(post)
         },
-        fetchColumns(state, rawData) {
+        fetchColumns(state, rawData: ResProps) {
             state.columns = rawData.data.list
         },
-        fetchColumn(state, rawData) {
+        fetchColumn(state, rawData: ResProps) {
             state.columns = [rawData.data]
         },
-        fetchPosts(state, rawData) {
+        fetchPosts(state, rawData: ResProps) {
             state.posts = rawData.data.list
         },
-        fetchCurrentUser(state, rawData) {
+        fetchCurrentUser(state, rawData: ResProps) {
             state.user = { isLogin: true, ...rawData.data }
         },
         setLoading(state, status) {
@@ -85,7 +91,7 @@ const store = createStore<GlobalDataProps>({
         setError(state, err) {
             state.error = err
         },
-        login(state, rawData) {
+        login(state, rawData: ResProps) {
             const { token } = rawData.data
             state.token = token
             localStorage.setItem('token', token)
@@ -94,8 +100,9 @@ const store = createStore<GlobalDataProps>({
         logout(state) {
             localStorage.removeItem('token')
             state.token = ''
+            state.user = { isLogin: false }
+            delete axios.defaults.headers.common.Authorization
             router.push({ name: 'home' })
-            location.reload()
         }
     },
     actions: {

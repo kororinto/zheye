@@ -16,7 +16,6 @@ import Loader from './components/Loader.vue'
 import createMessage from './components/createMessage'
 import { useStore } from 'vuex'
 import { GlobalDataProps } from './store'
-import axios from 'axios'
 
 export default defineComponent({
     name: 'App',
@@ -29,7 +28,6 @@ export default defineComponent({
         const store = useStore<GlobalDataProps>()
         const currentUser = computed(() => store.state.user)
         const loading = computed(() => store.state.loading)
-        const token = computed(() => store.state.token)
         const error = computed(() => store.state.error)
         watch(
             () => error.value.status,
@@ -40,12 +38,6 @@ export default defineComponent({
                 }
             }
         )
-        onMounted(() => {
-            if (token.value && !currentUser.value.isLogin) {
-                axios.defaults.headers.common.Authorization = `Bearer ${token.value}`
-                store.dispatch('fetchCurrentUser')
-            }
-        })
         return {
             currentUser,
             loading,

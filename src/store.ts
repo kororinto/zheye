@@ -53,6 +53,7 @@ export interface GlobalDataProps {
 const getAndCommit = async (url: string, mutationName: string, commit: Commit) => {
     const { data } = await axios.get(url)
     commit(mutationName, data)
+    return data
 }
 const postAndCommit = async (url: string, mutationName: string, commit: Commit, payload: any) => {
     const { data } = await axios.post(url, payload)
@@ -107,16 +108,16 @@ const store = createStore<GlobalDataProps>({
     },
     actions: {
         fetchColumns({ commit }) {
-            getAndCommit('/columns', 'fetchColumns', commit)
+            return getAndCommit('/columns', 'fetchColumns', commit)
         },
         fetchColumn({ commit }, columnId) {
-            getAndCommit(`/columns/${columnId}`, 'fetchColumn', commit)
+            return getAndCommit(`/columns/${columnId}`, 'fetchColumn', commit)
         },
         fetchPosts({ commit }, columnId) {
-            getAndCommit(`/columns/${columnId}/posts`, 'fetchPosts', commit)
+            return getAndCommit(`/columns/${columnId}/posts`, 'fetchPosts', commit)
         },
         fetchCurrentUser({ commit }) {
-            getAndCommit('/user/current', 'fetchCurrentUser', commit)
+            return getAndCommit('/user/current', 'fetchCurrentUser', commit)
         },
         login({ commit }, payload) {
             return postAndCommit('/user/login', 'login', commit, payload)

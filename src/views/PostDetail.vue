@@ -68,3 +68,10 @@ export default defineComponent({
     }
 })
 </script>
+
+<style>
+code {
+    background-color: #bbb;
+    color: #333;
+}
+</style>

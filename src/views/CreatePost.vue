@@ -4,14 +4,16 @@
         <input type="file" name="file" @change.prevent="handleFileChange" />
         <Uploader
             action="/upload"
-            :beforeUpload="beforeUpload"
+            :beforeUpload="uploadCheck"
             @fileUploaded="onFileUploaded"
             @fileUploadError="onFileUploadError"
             ref="uploadRef"
+            class="d-flex align-items-center justify-content-center bg-light text-secondary w-100 my-4"
         >
             <h2>点击上传图片</h2>
             <template #uploading>
                 <div class="spinner-border" role="status"></div>
+                <h2>上传中...</h2>
             </template>
             <template #uploaded="{ uploadedData }">
                 <img :src="uploadedData.data.url" width="500" @click.stop="deleteImg" />
@@ -56,6 +58,7 @@ import { useRouter } from 'vue-router'
 import { useStore } from 'vuex'
 import { GlobalDataProps, PostProps, ResProps, ImageProps } from '../store'
 import axios from 'axios'
+import { beforeUploadCheck } from '../helper'
 
 export default defineComponent({
     name: 'CreatePost',
@@ -65,6 +68,7 @@ export default defineComponent({
         Uploader
     },
     setup() {
+        let imageId = ''
         const router = useRouter()
         const store = useStore<GlobalDataProps>()
         const titleVal = ref('')
@@ -75,21 +79,23 @@ export default defineComponent({
         const onFormSubmit = (result: boolean) => {
             if (result) {
                 // 获取用户的对应column
-                const { column } = store.state.user
+                const { column, _id } = store.state.user
                 if (column) {
-                    // 创建文章
-                    const post: PostProps = {
-                        _id: Date.now().toString(),
+                    const newPost: PostProps = {
                         title: titleVal.value,
                         content: contentVal.value,
-                        createdAt: new Date().toString(),
-                        column: column + ''
+                        column,
+                        author: _id
                     }
-                    // 使用commit mutations 添加文章
-                    store.commit('createPost', post)
+                    if (imageId) {
+                        newPost.image = imageId
+                    }
+                    store.dispatch('createPost', newPost).then(() => {
+                        createMessage('发表成功~', 'success')
+                        // 跳转到专栏为id的页面
+                        router.push({ name: 'column', params: { id: column } })
+                    })
                 }
-                // 跳转到专栏为id的页面
-                router.push({ name: 'column', params: { column } })
             }
         }
         const handleFileChange = (e: Event) => {
@@ -110,15 +116,21 @@ export default defineComponent({
                     })
             }
         }
-        const beforeUpload = (file: File) => {
-            const isJPG = file.type === 'image/jpeg'
-            if (!isJPG) {
-                createMessage('上传图片只能是 JPG 格式', 'error')
-            }
-            return isJPG
-        }
+        // const beforeUpload = (file: File) => {
+        //     const isJPG = file.type === 'image/jpeg'
+        //     if (!isJPG) {
+        //         createMessage('上传图片只能是 JPG 格式', 'error')
+        //     }
+        //     return isJPG
+        // }
+        // const onFileUploaded = (rawData: ResProps<ImageProps>) => {
+        //     createMessage(`图片id ${rawData.data._id}`, 'success')
+        // }
+        // 获取图片id
         const onFileUploaded = (rawData: ResProps<ImageProps>) => {
-            createMessage(`图片id ${rawData.data._id}`, 'success')
+            if (rawData.data._id) {
+                imageId = rawData.data._id
+            }
         }
         const onFileUploadError = (err: ResProps<ImageProps>) => {
             console.log(err)
@@ -129,6 +141,17 @@ export default defineComponent({
             target.src = ''
             uploadRef.value.fileStatus = 'ready'
         }
+        const uploadCheck = (file: File) => {
+            const res = beforeUploadCheck(file, { format: ['image/jpeg', 'image/png'], size: 1 })
+            const { passed, error } = res
+            if (error === 'format') {
+                createMessage('上传文件只能是 JPG/PNG 格式', 'error')
+            }
+            if (error === 'size') {
+                createMessage('上传文件大小不能超过1Mb', 'error')
+            }
+            return passed
+        }
         return {
             titleVal,
             contentVal,
@@ -136,14 +159,25 @@ export default defineComponent({
             contentRules,
             onFormSubmit,
             handleFileChange,
-            beforeUpload,
+            // beforeUpload,
             onFileUploaded,
             onFileUploadError,
             deleteImg,
+            uploadCheck,
             uploadRef
         }
     }
 })
 </script>
 
-<style></style>
+<style>
+.create-post-page .file-upload-container {
+    height: 200px;
+    cursor: pointer;
+}
+.create-post-page .file-upload-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+</style>

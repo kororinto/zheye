@@ -20,13 +20,15 @@ export interface ColumnProps {
     description: string
 }
 export interface PostProps {
-    _id: string
+    _id?: string
     title: string
     excerpt?: string
     content?: string
-    image?: ImageProps
-    createdAt: string
+    image?: ImageProps | string
+    createdAt?: string
     column: string
+    author?: string
+    isHTML?: boolean
 }
 export interface UserProps {
     isLogin: boolean
@@ -83,6 +85,9 @@ const store = createStore<GlobalDataProps>({
         fetchPosts(state, rawData: ResProps) {
             state.posts = rawData.data.list
         },
+        fetchPost(state, rawData: ResProps) {
+            state.posts = [rawData.data]
+        },
         fetchCurrentUser(state, rawData: ResProps) {
             state.user = { isLogin: true, ...rawData.data }
         },
@@ -108,7 +113,7 @@ const store = createStore<GlobalDataProps>({
     },
     actions: {
         fetchColumns({ commit }) {
-            return getAndCommit('/columns', 'fetchColumns', commit)
+            return getAndCommit('/columns?currentPage=1&pageSize=10', 'fetchColumns', commit)
         },
         fetchColumn({ commit }, columnId) {
             return getAndCommit(`/columns/${columnId}`, 'fetchColumn', commit)
@@ -116,11 +121,17 @@ const store = createStore<GlobalDataProps>({
         fetchPosts({ commit }, columnId) {
             return getAndCommit(`/columns/${columnId}/posts`, 'fetchPosts', commit)
         },
+        fetchPost({ commit }, id) {
+            return getAndCommit(`/posts/${id}`, 'fetchPost', commit)
+        },
         fetchCurrentUser({ commit }) {
             return getAndCommit('/user/current', 'fetchCurrentUser', commit)
         },
         login({ commit }, payload) {
             return postAndCommit('/user/login', 'login', commit, payload)
+        },
+        createPost({ commit }, payload) {
+            return postAndCommit('/posts', 'createPost', commit, payload)
         },
         async loginAndFetch({ dispatch }, loginData) {
             await dispatch('login', loginData)
@@ -133,6 +144,9 @@ const store = createStore<GlobalDataProps>({
         },
         getPostsByColumnId: (state) => (columnId: string) => {
             return state.posts.filter((item) => item.column === columnId)
+        },
+        getPostById: (state) => (id: string) => {
+            return state.posts.find((item) => item._id === id)
         }
     }
 })

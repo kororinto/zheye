@@ -3,6 +3,7 @@ import Home from './views/Home.vue'
 import Login from './views/Login.vue'
 import ColumnDetail from './views/ColumnDetail.vue'
 import CreatePost from './views/CreatePost.vue'
+import PostDetail from './views/PostDetail.vue'
 import Signup from './views/Signup.vue'
 import store from './store'
 import axios from 'axios'
@@ -37,6 +38,11 @@ const router = createRouter({
             name: 'create',
             component: CreatePost,
             meta: { requiredLogin: true }
+        },
+        {
+            path: '/posts/:id',
+            name: 'posts',
+            component: PostDetail
         }
     ]
 })
@@ -57,7 +63,6 @@ router.beforeEach((to, from, next) => {
         // 未登录
         // 检查token
         if (token) {
-            console.log(token)
             // token已存在 获取用户信息
             axios.defaults.headers.common.Authorization = `Bearer ${token}`
             store
@@ -73,6 +78,8 @@ router.beforeEach((to, from, next) => {
                 .catch((err) => {
                     console.dir(err)
                     localStorage.removeItem('token')
+                    store.state.token = ''
+                    delete axios.defaults.headers.common.Authorization
                     next('/login')
                 })
         } else {

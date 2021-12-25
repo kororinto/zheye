@@ -23,3 +23,16 @@ export function beforeUploadCheck(file: File, condition: CheckCondition): checkR
         error
     }
 }
+
+export const arrToObj = <T extends { _id?: string }>(arr: T[]): { [key: string]: T } => {
+    return arr.reduce((previousValue, currentValue) => {
+        if (currentValue._id) {
+            previousValue[currentValue._id] = currentValue
+        }
+        return previousValue
+    }, {} as { [key: string]: T })
+}
+
+export const objToArr = <T>(obj: { [key: string]: T }): T[] => {
+    return Object.keys(obj).map((item) => obj[item])
+}

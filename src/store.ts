@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { createStore, Commit } from 'vuex'
 import router from './router'
+import { arrToObj, objToArr } from './helper'
 
 export interface ResProps<T = any> {
     code: number
@@ -43,9 +44,12 @@ export interface ErrorProps {
     status: boolean
     message?: string
 }
+interface ListProps<T> {
+    [index: string]: T
+}
 export interface GlobalDataProps {
-    columns: ColumnProps[]
-    posts: PostProps[]
+    columns: ListProps<ColumnProps>
+    posts: ListProps<PostProps>
     user: UserProps
     loading: boolean
     token: string
@@ -66,27 +70,27 @@ const postAndCommit = async (url: string, mutationName: string, commit: Commit, 
 const store = createStore<GlobalDataProps>({
     state: {
         error: { status: false },
-        columns: [],
-        posts: [],
+        columns: {},
+        posts: {},
         user: { isLogin: false },
         loading: false,
         token: localStorage.getItem('token') || ''
     },
     mutations: {
         createPost(state, post) {
-            state.posts.push(post)
+            state.posts[post._id] = post
         },
         fetchColumns(state, rawData: ResProps) {
-            state.columns = rawData.data.list
+            state.columns = arrToObj(rawData.data.list)
         },
         fetchColumn(state, rawData: ResProps) {
-            state.columns = [rawData.data]
+            state.columns[rawData.data._id] = rawData.data
         },
         fetchPosts(state, rawData: ResProps) {
-            state.posts = rawData.data.list
+            state.posts = arrToObj(rawData.data.list)
         },
         fetchPost(state, rawData: ResProps) {
-            state.posts = [rawData.data]
+            state.posts[rawData.data._id] = rawData.data
         },
         fetchCurrentUser(state, rawData: ResProps) {
             state.user = { isLogin: true, ...rawData.data }
@@ -139,14 +143,17 @@ const store = createStore<GlobalDataProps>({
         }
     },
     getters: {
+        getColumns: (state) => () => {
+            return objToArr(state.columns)
+        },
         getColumnById: (state) => (id: string) => {
-            return state.columns.find((item) => item._id === id)
+            return state.columns[id]
         },
         getPostsByColumnId: (state) => (columnId: string) => {
-            return state.posts.filter((item) => item.column === columnId)
+            return objToArr(state.posts).filter((item) => item.column === columnId)
         },
         getPostById: (state) => (id: string) => {
-            return state.posts.find((item) => item._id === id)
+            return state.posts[id]
         }
     }
 })

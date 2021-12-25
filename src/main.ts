@@ -44,33 +44,3 @@ axios.interceptors.response.use(
     }
 )
 createApp(App).use(router).use(store).mount('#app')
-interface Obj {
-    id: string
-    name: string
-}
-interface Arr {
-    [index: string]: Obj
-}
-const testData: Obj[] = [
-    { id: '1', name: 'a' },
-    { id: '2', name: 'b' },
-    { id: '3', name: 'c' }
-]
-const testData2: Arr = {
-    1: { id: '1', name: 'a' },
-    2: { id: '2', name: 'b' },
-    3: { id: '3', name: 'c' }
-}
-const arrToObj = <T extends { id?: string }>(arr: T[]) => {
-    return arr.reduce((previousValue, currentValue) => {
-        if (currentValue.id) {
-            previousValue[currentValue.id] = currentValue
-        }
-        return previousValue
-    }, {} as { [key: string]: T })
-}
-console.log(arrToObj(testData))
-const objToArr = <T>(obj: { [key: string]: T }) => {
-    return Object.keys(obj).map((item) => obj[item])
-}
-console.log(objToArr(testData2))
